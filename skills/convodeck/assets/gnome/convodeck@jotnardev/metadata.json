@@ -1,0 +1,8 @@
+{
+  "uuid": "convodeck@jotnardev",
+  "name": "ConvoDeck",
+  "description": "Top-bar menu for your Claude Code conversations: resume in a terminal, rename, delete, with short summaries. Requires the convodeck command (installed by the ConvoDeck skill).",
+  "shell-version": ["45", "46", "47", "48"],
+  "url": "https://github.com/JotnarDev/convodeck",
+  "version": 1
+}

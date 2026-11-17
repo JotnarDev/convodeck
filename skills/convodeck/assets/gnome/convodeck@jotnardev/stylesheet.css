@@ -1,0 +1,20 @@
+/* ConvoDeck — GNOME top-bar menu.
+   No hard-coded text colours: everything inherits the shell theme (light or dark);
+   secondary text is dimmed with actor opacity in extension.js. */
+.cd-title-item { padding-top: 4px; padding-bottom: 6px; }
+.cd-title { font-weight: bold; font-size: 13px; }
+.cd-meta, .cd-when, .cd-proj, .cd-count { font-family: monospace; font-size: 11px; }
+.cd-proj { font-size: 10px; max-width: 110px; }
+
+.cd-item { spacing: 10px; min-width: 470px; padding-top: 7px; padding-bottom: 7px; }
+.cd-text { spacing: 2px; width: 300px; }
+.cd-name { font-size: 13px; }
+.cd-summary { font-size: 11px; }
+.cd-side { spacing: 2px; min-width: 78px; }
+
+.cd-btn { padding: 3px 5px; border-radius: 6px; }
+.cd-btn:hover { background-color: rgba(127, 127, 127, 0.18); }
+.cd-btn-icon { icon-size: 14px; }
+.cd-btn.danger:hover .cd-btn-icon { color: #d0503f; }
+
+.cd-dialog .cd-entry { margin: 0 24px 12px 24px; min-width: 340px; }

@@ -1,0 +1,10 @@
+{
+  "name": "convodeck",
+  "description": "Find, resume, rename, summarize and delete your Claude Code conversations — with a desktop launcher window for Linux, Windows and macOS and an optional GNOME top-bar menu.",
+  "version": "1.0.0",
+  "author": { "name": "JotnarDev", "url": "https://github.com/JotnarDev" },
+  "homepage": "https://github.com/JotnarDev/convodeck",
+  "repository": "https://github.com/JotnarDev/convodeck",
+  "license": "MIT",
+  "keywords": ["claude-code", "sessions", "conversations", "resume", "launcher", "gnome", "windows", "linux"]
+}

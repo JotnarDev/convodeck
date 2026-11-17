@@ -1,0 +1,18 @@
+{
+  "name": "convodeck",
+  "owner": { "name": "JotnarDev", "url": "https://github.com/JotnarDev" },
+  "metadata": {
+    "description": "ConvoDeck — a launcher for your Claude Code conversations.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "convodeck",
+      "source": "./",
+      "description": "Find, resume, rename, summarize and delete your Claude Code conversations — with a desktop launcher window for Linux, Windows and macOS and an optional GNOME top-bar menu.",
+      "version": "1.0.0",
+      "category": "productivity",
+      "keywords": ["sessions", "conversations", "resume", "launcher", "gnome", "windows"]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="56" fill="#15181d"/>
+  <!-- back card -->
+  <rect x="70" y="50" width="136" height="96" rx="20" fill="#2a3340"/>
+  <!-- front bubble -->
+  <path d="M66 88h112a22 22 0 0 1 22 22v62a22 22 0 0 1-22 22h-60l-34 26v-26H66a22 22 0 0 1-22-22v-62a22 22 0 0 1 22-22z" fill="#8ec5e6"/>
+  <!-- prompt: chevron + cursor -->
+  <path d="M78 122l22 19-22 19" fill="none" stroke="#15181d" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="112" y="152" width="44" height="13" rx="6.5" fill="#15181d"/>
+</svg>

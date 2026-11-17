@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConvoDeck</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f6f7f9; --surface: #ffffff; --surface-2: #eef1f4; --line: #dfe3e8;
+    --text: #15181d; --muted: #5d6673; --faint: #8b94a0;
+    --accent: #2f7fb0; --accent-soft: #e2f0f8; --danger: #c0473a; --danger-soft: #fbe9e7;
+    --radius: 12px; --shadow: 0 1px 2px rgba(20, 24, 29, .06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111316; --surface: #1a1d22; --surface-2: #22262c; --line: #2c3138;
+      --text: #e6e8eb; --muted: #a3abb6; --faint: #6f7884;
+      --accent: #8ec5e6; --accent-soft: #1e2d38; --danger: #e08a7e; --danger-soft: #3a2220;
+      --shadow: none; color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, sans-serif;
+    display: flex; flex-direction: column;
+  }
+  .mono { font-family: ui-monospace, "JetBrains Mono", "Cascadia Mono", Consolas, monospace; }
+
+  header { padding: 16px 16px 10px; display: grid; gap: 12px; border-bottom: 1px solid var(--line); background: var(--bg); }
+  .top { display: flex; align-items: center; gap: 10px; }
+  .top img { width: 26px; height: 26px; }
+  .top h1 { font-size: 16px; margin: 0; font-weight: 650; letter-spacing: -.01em; }
+  .count { color: var(--faint); font-size: 12px; }
+  .spacer { flex: 1; }
+  button {
+    font: inherit; color: inherit; background: none; border: 0; cursor: pointer; border-radius: 8px;
+  }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .primary { background: var(--accent); color: var(--bg); padding: 6px 12px; font-weight: 600; font-size: 13px; }
+  .primary:hover { filter: brightness(1.08); }
+  .search {
+    width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--text); font: inherit;
+  }
+  .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .chip {
+    white-space: nowrap; padding: 4px 10px; border-radius: 999px; font-size: 12px;
+    background: var(--surface-2); color: var(--muted);
+  }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .chip span { color: var(--faint); margin-left: 4px; }
+
+  main { flex: 1; overflow-y: auto; padding: 10px 12px 20px; }
+  .group { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); margin: 14px 6px 6px; }
+  .card {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 11px 12px; margin-bottom: 6px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); cursor: pointer; transition: border-color .12s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card.missing { opacity: .6; cursor: default; }
+  .card.missing:hover { border-color: var(--line); }
+  .title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .summary { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+  .meta { grid-column: 1 / -1; color: var(--faint); font-size: 11.5px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .actions { display: flex; gap: 2px; opacity: .55; }
+  .card:hover .actions, .card:focus-within .actions { opacity: 1; }
+  .icon { width: 28px; height: 28px; display: grid; place-items: center; color: var(--muted); }
+  .icon:hover { background: var(--surface-2); color: var(--accent); }
+  .icon.danger:hover { color: var(--danger); background: var(--danger-soft); }
+  .icon svg { width: 16px; height: 16px; }
+  .edit { grid-column: 1 / -1; display: flex; gap: 6px; }
+  .edit input { flex: 1; min-width: 0; padding: 6px 9px; border-radius: 8px; border: 1px solid var(--accent); background: var(--surface); color: var(--text); font: inherit; }
+  .ghost { padding: 6px 10px; font-size: 13px; color: var(--muted); }
+  .ghost:hover { background: var(--surface-2); }
+  .confirm { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; background: var(--danger-soft); border-radius: 8px; padding: 6px 6px 6px 10px; font-size: 13px; }
+  .confirm .msg { flex: 1; }
+  .del { background: var(--danger); color: var(--surface); padding: 5px 10px; font-weight: 600; font-size: 13px; }
+  .empty { text-align: center; color: var(--faint); padding: 48px 16px; }
+  .toast {
+    position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%) translateY(20px); opacity: 0;
+    background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 10px; font-size: 13px;
+    transition: .2s; pointer-events: none; max-width: calc(100% - 32px);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%); }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <img src="/icon.svg" alt="">
+    <h1>ConvoDeck</h1>
+    <span class="count" id="count"></span>
+    <span class="spacer"></span>
+    <button class="primary" id="new"></button>
+  </div>
+  <input class="search" id="search" type="search" autocomplete="off">
+  <div class="chips" id="chips" role="toolbar"></div>
+</header>
+<main id="list" aria-live="polite"></main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const TOKEN = new URLSearchParams(location.search).get('t');
+const I18N = {
+  en: {new: 'New', search: 'Search title, summary or folder…', all: 'All', home: 'Home',
+       recent: 'Recent', older: 'Earlier', empty: 'No conversations yet.', nomatch: 'Nothing matches your search.',
+       resume: 'Resume', rename: 'Rename', del: 'Delete', save: 'Save', cancel: 'Cancel',
+       confirm: 'Move to the trash? You can restore it from there.', missing: 'folder missing',
+       msgs: n => `${n} message${n === 1 ? '' : 's'}`, today: 'today', yesterday: 'yesterday',
+       opened: 'Opening in a new terminal…', deleted: 'Moved to the trash', renamed: 'Renamed',
+       nofolder: 'Its folder no longer exists, so it cannot be resumed.', count: n => `${n}`,
+       placeholder: 'Empty = automatic title', months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']},
+  es: {new: 'Nueva', search: 'Buscar por título, resumen o carpeta…', all: 'Todas', home: 'Inicio',
+       recent: 'Recientes', older: 'Anteriores', empty: 'Aún no hay conversaciones.', nomatch: 'Nada coincide con la búsqueda.',
+       resume: 'Retomar', rename: 'Renombrar', del: 'Eliminar', save: 'Guardar', cancel: 'Cancelar',
+       confirm: '¿Mover a la papelera? Puedes recuperarla desde ahí.', missing: 'sin carpeta',
+       msgs: n => `${n} mensaje${n === 1 ? '' : 's'}`, today: 'hoy', yesterday: 'ayer',
+       opened: 'Abriendo en una terminal nueva…', deleted: 'Movida a la papelera', renamed: 'Renombrada',
+       nofolder: 'Su carpeta ya no existe, así que no se puede retomar.', count: n => `${n}`,
+       placeholder: 'Vacío = título automático', months: ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']},
+};
+let L = I18N.en, data = [], filter = 'all', query = '', editing = null, confirming = null;
+
+const $ = id => document.getElementById(id);
+const ICONS = {
+  edit: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M11.3 1.9a1.5 1.5 0 0 1 2.1 0l.7.7a1.5 1.5 0 0 1 0 2.1L6 12.8l-3.4.9.9-3.4zM4.6 10.4l-.4 1.4 1.4-.4 6.7-6.7-1-1z"/></svg>',
+  trash: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 1.5h4l.5 1H14V4H2V2.5h3.5zM3 5h10l-.8 9a1 1 0 0 1-1 .9H4.8a1 1 0 0 1-1-.9zm3 2v6h1.2V7zm2.8 0v6H10V7z"/></svg>',
+};
+
+async function api(path, body = {}) {
+  const r = await fetch(path, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-Token': TOKEN},
+                               body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+function when(ts) {
+  const d = new Date(ts * 1000), now = new Date();
+  const hm = d.toTimeString().slice(0, 5);
+  const day = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((day(now) - day(d)) / 864e5);
+  if (diff === 0) return `${L.today} ${hm}`;
+  if (diff === 1) return `${L.yesterday} ${hm}`;
+  const base = `${d.getDate()} ${L.months[d.getMonth()]}`;
+  return d.getFullYear() === now.getFullYear() ? `${base} ${hm}` : `${base} ${d.getFullYear()}`;
+}
+
+const folderName = p => p === '~' ? L.home : p;
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function renderChips() {
+  const counts = new Map();
+  for (const c of data) counts.set(c.project, (counts.get(c.project) || 0) + 1);
+  const chips = $('chips');
+  chips.replaceChildren();
+  const add = (key, label, n) => {
+    const b = el('button', 'chip', label);
+    b.setAttribute('aria-pressed', String(filter === key));
+    const s = el('span', null, n);
+    b.append(s);
+    b.onclick = () => { filter = key; render(); };
+    chips.append(b);
+  };
+  add('all', L.all, data.length);
+  for (const [p, n] of counts) add(p, folderName(p), n);
+}
+
+function card(c) {
+  const node = el('article', 'card' + (c.exists ? '' : ' missing'));
+  node.tabIndex = 0;
+  node.title = c.exists ? `${L.resume} — ${c.cwd}` : L.nofolder;
+  const title = el('div', 'title', c.title);
+  const actions = el('div', 'actions');
+  const mk = (icon, label, cls, fn) => {
+    const b = el('button', 'icon' + (cls ? ' ' + cls : ''));
+    b.innerHTML = ICONS[icon];
+    b.setAttribute('aria-label', label);
+    b.title = label;
+    b.onclick = e => { e.stopPropagation(); fn(); };
+    return b;
+  };
+  actions.append(mk('edit', L.rename, '', () => { editing = c.id; confirming = null; render(); }),
+                 mk('trash', L.del, 'danger', () => { confirming = c.id; editing = null; render(); }));
+  node.append(title, actions);
+
+  if (editing === c.id) {
+    const row = el('div', 'edit');
+    const input = el('input');
+    input.value = c.title;
+    input.placeholder = L.placeholder;
+    input.maxLength = 80;
+    const save = el('button', 'primary', L.save), cancel = el('button', 'ghost', L.cancel);
+    const done = async () => {
+      try { await api('/api/rename', {id: c.id, title: input.value}); toast(L.renamed); }
+      catch (e) { toast(e.message); }
+      editing = null; load();
+    };
+    save.onclick = e => { e.stopPropagation(); done(); };
+    cancel.onclick = e => { e.stopPropagation(); editing = null; render(); };
+    input.onclick = e => e.stopPropagation();
+    input.onkeydown = e => { if (e.key === 'Enter') done(); if (e.key === 'Escape') { editing = null; render(); } };
+    row.append(input, save, cancel);
+    node.append(row);
+    setTimeout(() => { input.focus(); input.select(); });
+  } else if (confirming === c.id) {
+    const row = el('div', 'confirm');
+    const yes = el('button', 'del', L.del), no = el('button', 'ghost', L.cancel);
+    yes.onclick = async e => {
+      e.stopPropagation();
+      try { await api('/api/delete', {id: c.id}); toast(L.deleted); }
+      catch (err) { toast(err.message); }
+      confirming = null; load();
+    };
+    no.onclick = e => { e.stopPropagation(); confirming = null; render(); };
+    row.append(el('span', 'msg', L.confirm), no, yes);
+    node.append(row);
+    setTimeout(() => no.focus());
+  } else if (c.summary) {
+    node.append(el('div', 'summary', c.summary));
+  }
+
+  const meta = el('div', 'meta mono');
+  meta.append(el('span', null, c.exists ? when(c.last) : L.missing),
+              el('span', null, folderName(c.project)),
+              el('span', null, L.msgs(c.messages)));
+  node.append(meta);
+
+  const open = async () => {
+    if (!c.exists) return toast(L.nofolder);
+    try { await api('/api/open', {id: c.id}); toast(L.opened); } catch (e) { toast(e.message); }
+  };
+  node.onclick = open;
+  node.onkeydown = e => { if (e.key === 'Enter' && e.target === node) open(); };
+  return node;
+}
+
+function render() {
+  renderChips();
+  const q = query.trim().toLowerCase();
+  const items = data.filter(c => (filter === 'all' || c.project === filter) &&
+    (!q || `${c.title} ${c.summary} ${folderName(c.project)}`.toLowerCase().includes(q)));
+  const list = $('list');
+  list.replaceChildren();
+  if (!items.length) {
+    list.append(el('div', 'empty', data.length ? L.nomatch : L.empty));
+    return;
+  }
+  const weekAgo = Date.now() / 1000 - 7 * 86400;
+  const recent = items.filter(c => c.last >= weekAgo), older = items.filter(c => c.last < weekAgo);
+  for (const [label, group] of [[L.recent, recent], [L.older, older]]) {
+    if (!group.length) continue;
+    if (older.length && recent.length) list.append(el('div', 'group', label));
+    for (const c of group) list.append(card(c));
+  }
+}
+
+async function load() {
+  try {
+    const r = await api('/api/list');
+    L = I18N[r.lang] || I18N.en;
+    document.documentElement.lang = r.lang;
+    data = r.conversations;
+    if (filter !== 'all' && !data.some(c => c.project === filter)) filter = 'all';
+    $('count').textContent = L.count(data.length);
+    $('new').textContent = '+ ' + L.new;
+    $('search').placeholder = L.search;
+    render();
+  } catch (e) {
+    $('list').replaceChildren(el('div', 'empty', e.message));
+  }
+}
+
+$('search').oninput = e => { query = e.target.value; render(); };
+$('new').onclick = async () => { try { await api('/api/new'); toast(L.opened); } catch (e) { toast(e.message); } };
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); $('search').focus(); }
+});
+// keep the local server alive while the window is open; refresh when coming back to it
+setInterval(() => api('/api/ping').catch(() => {}), 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !editing && !confirming) load(); });
+load();
+</script>
+</body>
+</html>
