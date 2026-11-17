@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ConvoDeck — a launcher for your Claude Code conversations.
 
-Cross-platform (Linux, Windows, macOS), standard library only (Python 3.8+).
+Cross-platform (Linux, Windows, macOS), standard library only (Python 3.9+).
 
 Commands:
   list [--json] [--limit N] [--search TEXT]   list conversations, newest first

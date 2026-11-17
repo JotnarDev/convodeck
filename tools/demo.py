@@ -6,6 +6,7 @@
   XDG_CACHE_HOME=/tmp/convodeck-demo/cache python3 skills/convodeck/scripts/convodeck.py ui
 """
 import json
+import re
 import sys
 import time
 import uuid
@@ -44,7 +45,8 @@ now = time.time()
 for folder, hours_ago, title, summary, first in SESSIONS[lang]:
     cwd = home / 'Projects' / folder if folder else home
     cwd.mkdir(parents=True, exist_ok=True)
-    proj = root / 'claude' / 'projects' / str(cwd).replace('/', '-')
+    # Claude Code names project folders after the path with every non-alphanumeric character as '-'
+    proj = root / 'claude' / 'projects' / re.sub(r'[^A-Za-z0-9]', '-', str(cwd))
     proj.mkdir(parents=True, exist_ok=True)
     sid = str(uuid.uuid5(uuid.NAMESPACE_URL, f'convodeck-demo/{lang}/{title}'))
     ts = datetime.fromtimestamp(now - hours_ago * 3600, timezone.utc).isoformat().replace('+00:00', 'Z')

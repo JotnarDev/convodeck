@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/JotnarDev/convodeck/actions/workflows/test.yml"><img src="https://github.com/JotnarDev/convodeck/actions/workflows/test.yml/badge.svg" alt="tests"></a>
-  <img src="https://img.shields.io/badge/python-3.8%2B-blue" alt="Python 3.8+">
+  <img src="https://img.shields.io/badge/python-3.9%2B-blue" alt="Python 3.9+">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT">
 </p>
 
@@ -72,7 +72,7 @@ python3 convodeck/skills/convodeck/scripts/convodeck.py install      # Windows: 
 
 Uninstall with `convodeck uninstall` (your titles and summaries are kept).
 
-**Requirements:** Python 3.8+ (standard library only — nothing to `pip install`) and Claude Code.
+**Requirements:** Python 3.9+ (standard library only — nothing to `pip install`) and Claude Code.
 On Windows, `winget install Python.Python.3.12` if you don't have Python.
 
 ## Command line

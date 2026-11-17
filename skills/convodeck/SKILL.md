@@ -19,7 +19,7 @@ ConvoDeck turns the raw session files Claude Code keeps in `~/.claude/projects/`
 a ≤20-word summary and the date each conversation was last used, plus actions to resume it in a
 new terminal, rename it, hide it or move it to the trash.
 
-Everything goes through one script, `scripts/convodeck.py` (Python 3.8+, standard library only).
+Everything goes through one script, `scripts/convodeck.py` (Python 3.9+, standard library only).
 Call it with the path relative to this skill's base directory:
 
 - Linux / macOS: `python3 <skill-dir>/scripts/convodeck.py <command>`
